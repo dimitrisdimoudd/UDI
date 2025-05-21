@@ -1,5 +1,26 @@
 import streamlit as st
-import pytesseract
+import requests
+import base64
+
+def extract_text_from_image(image):
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+
+    response = requests.post(
+        "https://api.ocr.space/parse/image",
+        data={
+            'apikey': 'helloworld',  # free key
+            'base64Image': 'data:image/jpeg;base64,' + img_str,
+            'language': 'eng',
+        },
+    )
+
+    result = response.json()
+    if result['IsErroredOnProcessing']:
+        return "Error: " + result.get("ErrorMessage", ["Unknown error"])[0]
+    else:
+        return result['ParsedResults'][0]['ParsedText']
 from PIL import Image
 import re
 
