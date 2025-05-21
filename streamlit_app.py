@@ -6,32 +6,39 @@ from PIL import Image
 import re
 
 def extract_text_from_image(image):
+    import json
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
-    # Adjust MIME type dynamically
+    # Detect image MIME type
     mime_type = "image/png" if image.format == "PNG" else "image/jpeg"
+    payload = {
+        'apikey': 'K87788557888957',  # Your OCR.Space API key
+        'base64Image': f'data:{mime_type};base64,' + img_str,
+        'language': 'eng',
+    }
 
-    response = requests.post(
-        "https://api.ocr.space/parse/image",
-        data={
-            'apikey': 'K87788557888957',  # Your real API key
-            'base64Image': f'data:{mime_type};base64,' + img_str,
-            'language': 'eng',
-        },
-    )
+    try:
+        response = requests.post(
+            "https://api.ocr.space/parse/image",
+            data=payload,
+        )
 
-    # Debug: show status and full response
-    st.write("Status Code:", response.status_code)
-    st.write("Response Text:", response.text)
+        # Debug info
+        st.code(f"Status Code: {response.status_code}")
+        st.code(f"Headers: {response.headers}")
+        st.code(f"Response Text:\n{response.text}")
 
-    result = response.json()
-    if result['IsErroredOnProcessing']:
-        return "Error: " + result.get("ErrorMessage", ["Unknown error"])[0]
-    else:
-        return result['ParsedResults'][0]['ParsedText']
+        result = response.json()
+        if result.get('IsErroredOnProcessing'):
+            return "Error: " + result.get("ErrorMessage", ["Unknown error"])[0]
+        else:
+            return result['ParsedResults'][0]['ParsedText']
+    except Exception as e:
+        return f"Exception occurred: {e}"
 
+# Streamlit App Layout
 st.title("🔍 Label Checker - UDI Validator")
 
 uploaded_file = st.file_uploader("Upload an image with UDI labels", type=["png", "jpg", "jpeg"])
