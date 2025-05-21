@@ -31,6 +31,9 @@ uploaded_file = st.file_uploader("Upload an image with UDI labels", type=["png",
 if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, use_container_width=True)
+text = extract_text_from_image(image)
+    
+    
     # Extract text with OCR
 
 
