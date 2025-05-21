@@ -1,7 +1,11 @@
+
+        from io import BytesIO
 import re
 import streamlit as st
 import requests
 import base64
+from PIL import Image
+
 def extract_text_from_image(image):
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
@@ -10,7 +14,7 @@ def extract_text_from_image(image):
     response = requests.post(
         "https://api.ocr.space/parse/image",
         data={
-            'apikey': 'helloworld',  # free key
+            'apikey': 'helloworld',  # Replace with real API key for production
             'base64Image': 'data:image/jpeg;base64,' + img_str,
             'language': 'eng',
         },
@@ -21,8 +25,6 @@ def extract_text_from_image(image):
         return "Error: " + result.get("ErrorMessage", ["Unknown error"])[0]
     else:
         return result['ParsedResults'][0]['ParsedText']
-from PIL import Image
-import re
 
 st.title("🔍 Label Checker - UDI Validator")
 
@@ -31,11 +33,8 @@ uploaded_file = st.file_uploader("Upload an image with UDI labels", type=["png",
 if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, use_container_width=True)
-text = extract_text_from_image(image)
-    
-    
-    # Extract text with OCR
 
+    text = extract_text_from_image(image)  # ← FIXED: add this line
 
     # Find all 9-digit numbers
     numbers = re.findall(r'\b\d{9}\b', text)
@@ -53,7 +52,5 @@ text = extract_text_from_image(image)
     if not found_valid:
         st.error("❌ No 9-digit number appears 3 times. Label is NOT valid.")
 
-    # Optionally display all detected numbers
     with st.expander("See all detected 9-digit numbers"):
         st.write(count_map)
-        
