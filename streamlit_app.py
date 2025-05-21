@@ -33,7 +33,7 @@ if uploaded_file:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     # Extract text with OCR
-    text = pytesseract.image_to_string(image)
+
 
     # Find all 9-digit numbers
     numbers = re.findall(r'\b\d{9}\b', text)
