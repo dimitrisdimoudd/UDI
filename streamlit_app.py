@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import base64
-
+import re
 def extract_text_from_image(image):
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
