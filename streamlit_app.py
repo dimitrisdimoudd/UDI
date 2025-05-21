@@ -13,7 +13,7 @@ def extract_text_from_image(image):
     response = requests.post(
         "https://api.ocr.space/parse/image",
         data={
-            'apikey': 'helloworld',  # Replace with real API key for production
+            'apikey': 'K87788557888957',  # Replace with real API key for production
             'base64Image': 'data:image/jpeg;base64,' + img_str,
             'language': 'eng',
         },
